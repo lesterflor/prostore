@@ -1,26 +1,11 @@
-import React from 'react';
-
-interface IDataProps {
-	name: string;
-	slug: string;
-	category: string;
-	description: string;
-	images: string[];
-	price: number;
-	brand: string;
-	rating: number;
-	numReviews: number;
-	stock: number;
-	isFeatured: boolean;
-	banner: string | null;
-}
+import ProductCard, { IProduct } from './product-card';
 
 export default function ProductList({
 	data,
 	title,
 	limit
 }: {
-	data: IDataProps[];
+	data: IProduct[];
 	title?: string;
 	limit?: number;
 }) {
@@ -32,7 +17,12 @@ export default function ProductList({
 			{!!limitedData.length ? (
 				<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
 					{limitedData.map((product) => {
-						return <div key={product.name}>{product.name}</div>;
+						return (
+							<ProductCard
+								key={product.slug}
+								product={product}
+							/>
+						);
 					})}
 				</div>
 			) : (
