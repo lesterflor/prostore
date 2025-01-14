@@ -1,4 +1,5 @@
-import ProductCard, { IProduct } from './product-card';
+import { IProduct } from '@/types';
+import ProductCard from './product-card';
 
 export default function ProductList({
 	data,

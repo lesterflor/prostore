@@ -2,23 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import ProdcutPrice from './product-price';
-
-export interface IProduct {
-	id: string;
-	name: string;
-	slug: string;
-	category: string;
-	description: string;
-	images: string[];
-	price: number;
-	brand: string;
-	rating: number;
-	numReviews: number;
-	stock: number;
-	isFeatured: boolean;
-	banner: string | null;
-	createdAt: string;
-}
+import { IProduct } from '@/types';
 
 export default function ProductCard({ product }: { product: IProduct }) {
 	return (

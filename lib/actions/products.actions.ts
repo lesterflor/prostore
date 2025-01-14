@@ -2,13 +2,15 @@
 import { convertToPOJO } from '@/lib/utils';
 
 import { PrismaClient } from '@prisma/client';
+import { LATEST_PRODUCTS_LIMIT } from '../constants';
+import { IProduct } from '@/types';
 
 // get latest products
-export async function getLatestProducts() {
+export async function getLatestProducts(): Promise<IProduct[]> {
 	const prisma = new PrismaClient();
 
 	const data = await prisma.product.findMany({
-		take: 4,
+		take: LATEST_PRODUCTS_LIMIT,
 		orderBy: {
 			createdAt: 'desc'
 		}
