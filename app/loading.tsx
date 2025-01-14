@@ -13,6 +13,7 @@ export default function loading() {
 			}}>
 			<Image
 				src={loader}
+				unoptimized
 				height={150}
 				width={150}
 				alt='Loading'

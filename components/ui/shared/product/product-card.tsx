@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import ProdcutPrice from './product-price';
 
 export interface IProduct {
+	id: string;
 	name: string;
 	slug: string;
 	category: string;
@@ -16,6 +17,7 @@ export interface IProduct {
 	stock: number;
 	isFeatured: boolean;
 	banner: string | null;
+	createdAt: string;
 }
 
 export default function ProductCard({ product }: { product: IProduct }) {
