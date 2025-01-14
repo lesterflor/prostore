@@ -1,14 +1,11 @@
 'use server';
 import { convertToPOJO } from '@/lib/utils';
-
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/db/prisma';
 import { LATEST_PRODUCTS_LIMIT } from '../constants';
 import { IProduct } from '@/types';
 
 // get latest products
 export async function getLatestProducts(): Promise<IProduct[]> {
-	const prisma = new PrismaClient();
-
 	const data = await prisma.product.findMany({
 		take: LATEST_PRODUCTS_LIMIT,
 		orderBy: {
@@ -19,8 +16,6 @@ export async function getLatestProducts(): Promise<IProduct[]> {
 	const noDecimal = data.map((item) => {
 		return {
 			...item,
-			price: item.price.toString(),
-			rating: item.rating.toNumber(),
 			createdAt: new Date(item.createdAt.toString())
 		};
 	});
