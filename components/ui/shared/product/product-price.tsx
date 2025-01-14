@@ -4,13 +4,11 @@ export default function ProdcutPrice({
 	value,
 	className
 }: {
-	value: number;
+	value: string;
 	className?: string;
 }) {
-	// ensure to precision (2)
-	const stringValue = value.toFixed(2);
 	// get int
-	const [intValue, float] = stringValue.split('.');
+	const [intValue, float] = value.split('.');
 
 	return (
 		<p className={cn('text-2xl', className)}>

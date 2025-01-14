@@ -19,9 +19,9 @@ export async function getLatestProducts(): Promise<IProduct[]> {
 	const noDecimal = data.map((item) => {
 		return {
 			...item,
-			price: item.price.toNumber(),
+			price: item.price.toString(),
 			rating: item.rating.toNumber(),
-			createdAt: item.createdAt.toString()
+			createdAt: new Date(item.createdAt.toString())
 		};
 	});
 
