@@ -4,7 +4,6 @@ import { prisma } from './db/prisma';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compareSync } from 'bcrypt-ts-edge';
 import type { NextAuthConfig } from 'next-auth';
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export const config = {
@@ -72,7 +71,7 @@ export const config = {
 
 			return session;
 		},
-		async jwt({ token, user, trigger, session }: any) {
+		async jwt({ token, user }: any) {
 			// assign user fields to token
 			if (user) {
 				token.role = user.role;
@@ -96,7 +95,7 @@ export const config = {
 			return token;
 		},
 
-		authorized({ request, auth }: any) {
+		authorized({ request }: any) {
 			// check for session cart cookie
 			if (!request.cookies.get('sessionCartId')) {
 				const sessionCartId = crypto.randomUUID();
