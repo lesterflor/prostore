@@ -8,6 +8,7 @@ import { signUpUser } from '@/lib/actions/user.actions';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 export default function SignUpForm() {
 	const searchParams = useSearchParams();
@@ -26,7 +27,7 @@ export default function SignUpForm() {
 				disabled={pending}
 				className='w-full'
 				variant='default'>
-				{pending ? 'Signing in...' : 'Sign In'}
+				{pending ? 'Submitting...' : 'Sign Up'}
 			</Button>
 		);
 	};
@@ -44,7 +45,6 @@ export default function SignUpForm() {
 					<Input
 						id='name'
 						name='name'
-						required
 						type='text'
 						defaultValue={signUpDefaultValues.email}
 					/>
@@ -55,8 +55,7 @@ export default function SignUpForm() {
 					<Input
 						id='email'
 						name='email'
-						required
-						type='email'
+						type='text'
 						autoComplete='email'
 						defaultValue={signUpDefaultValues.email}
 					/>
@@ -93,6 +92,16 @@ export default function SignUpForm() {
 				{data && !data.success && (
 					<div className='text-center text-destructive'>{data.message}</div>
 				)}
+
+				<div className='text-sm text-center text-muted-foreground'>
+					Already have an account?{' '}
+					<Link
+						href='/sign-in'
+						target='_self'
+						className='link'>
+						Sign In
+					</Link>
+				</div>
 			</div>
 		</form>
 	);
