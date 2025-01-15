@@ -32,10 +32,11 @@ export async function getProductBySlug(slug: string) {
 		}
 	});
 
-	const formatProduct = {
-		...product,
-		price: Number(product?.price).toFixed(2)
-	};
+	if (product) {
+		Object.assign(product, {
+			price: Number(product?.price).toFixed(2)
+		});
+	}
 
-	return formatProduct;
+	return product;
 }
