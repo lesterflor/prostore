@@ -93,31 +93,31 @@ export const config = {
 			}
 
 			return token;
-		},
-
-		authorized({ request }: any) {
-			// check for session cart cookie
-			if (!request.cookies.get('sessionCartId')) {
-				const sessionCartId = crypto.randomUUID();
-
-				// clone request headers
-				const newRequestHeaders = new Headers(request.headers);
-
-				// create new response and add the new headers
-				const response = NextResponse.next({
-					request: {
-						headers: newRequestHeaders
-					}
-				});
-
-				// set newly generated session cart id in the response cookies
-				response.cookies.set('sessionCartId', sessionCartId);
-
-				return response;
-			} else {
-				return true;
-			}
 		}
+
+		// authorized({ request }: any) {
+		// 	// check for session cart cookie
+		// 	if (!request.cookies.get('sessionCartId')) {
+		// 		const sessionCartId = crypto.randomUUID();
+
+		// 		// clone request headers
+		// 		const newRequestHeaders = new Headers(request.headers);
+
+		// 		// create new response and add the new headers
+		// 		const response = NextResponse.next({
+		// 			request: {
+		// 				headers: newRequestHeaders
+		// 			}
+		// 		});
+
+		// 		// set newly generated session cart id in the response cookies
+		// 		response.cookies.set('sessionCartId', sessionCartId);
+
+		// 		return response;
+		// 	} else {
+		// 		return true;
+		// 	}
+		// }
 	}
 } satisfies NextAuthConfig;
 
