@@ -16,6 +16,7 @@ export async function getLatestProducts(): Promise<IProduct[]> {
 	const noDecimal = data.map((item) => {
 		return {
 			...item,
+			price: Number(item.price).toFixed(2),
 			createdAt: new Date(item.createdAt.toString())
 		};
 	});
@@ -31,5 +32,10 @@ export async function getProductBySlug(slug: string) {
 		}
 	});
 
-	return product;
+	const formatProduct = {
+		...product,
+		price: Number(product?.price).toFixed(2)
+	};
+
+	return formatProduct;
 }
