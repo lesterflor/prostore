@@ -144,11 +144,11 @@ export const config = {
 
 			// check if user is not authenticated and accessing protected route
 			if (!auth && protectedPaths.some((p) => p.test(pathname))) {
-				return NextResponse.redirect(new URL('/sign-in', request.url));
+				return false;
 			}
 
-			// check for session cart cookie
 			if (!request.cookies.get('sessionCartId')) {
+				// check for session cart cookie
 				const sessionCartId = crypto.randomUUID();
 
 				// clone request headers
