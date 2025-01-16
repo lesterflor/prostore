@@ -129,7 +129,24 @@ export const config = {
 			return token;
 		},
 
-		authorized({ request }: any) {
+		authorized({ request, auth }: any) {
+			const protectedPaths = [
+				/\/shipping-address/,
+				/\/payment-method/,
+				/\/place-order/,
+				/\/profile/,
+				/\/user\/(.*)/,
+				/\/order\/(.*)/,
+				/\/admin/
+			];
+			// get pathname
+			const { pathname } = request.nextUrl;
+
+			// check if user is not authenticated and accessing protected route
+			if (!auth && protectedPaths.some((p) => p.test(pathname))) {
+				return NextResponse.redirect(new URL('/sign-in', request.url));
+			}
+
 			// check for session cart cookie
 			if (!request.cookies.get('sessionCartId')) {
 				const sessionCartId = crypto.randomUUID();
