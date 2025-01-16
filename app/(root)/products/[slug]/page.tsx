@@ -5,6 +5,7 @@ import ProdcutPrice from '@/components/shared/product/product-price';
 import { Card, CardContent } from '@/components/ui/card';
 import ProductImages from '@/components/shared/product/product-images';
 import AddToCart from '@/components/shared/product/add-to-cart';
+import { getMyCart } from '@/lib/actions/cart.actions';
 
 export default async function ProductDetailsPage(props: {
 	params: Promise<{ slug: string }>;
@@ -16,6 +17,8 @@ export default async function ProductDetailsPage(props: {
 	if (!product) {
 		notFound();
 	}
+
+	const cart = await getMyCart();
 
 	return (
 		<>
@@ -73,6 +76,7 @@ export default async function ProductDetailsPage(props: {
 								{!!product.stock && (
 									<div className='flex-center'>
 										<AddToCart
+											cart={cart}
 											item={{
 												productId: product.id,
 												name: product.name,

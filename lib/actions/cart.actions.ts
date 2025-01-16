@@ -167,3 +167,77 @@ export async function getMyCart() {
 		shippingPrice: cart.shippingPrice.toString()
 	});
 }
+
+// delete items
+export async function removeItemFromCart(productId: string) {
+	try {
+		// check for cookie
+		const sessionCartId = (await cookies()).get('sessionCartId')?.value;
+
+		if (!sessionCartId) {
+			throw new Error('Cart session not found');
+		}
+
+		// get product
+		const product = await prisma.product.findFirst({
+			where: {
+				id: productId
+			}
+		});
+
+		if (!product) {
+			throw new Error('Product not found');
+		}
+
+		// get users cart
+		const cart = await getMyCart();
+
+		if (!cart) {
+			throw new Error('Cart not found');
+		}
+
+		// check for item
+		const exist = (cart.items as CartItem[]).find(
+			(x) => x.productId === productId
+		);
+
+		if (!exist) {
+			throw new Error('Item not found in cart');
+		}
+
+		// check if only 1 in qty
+		if (exist.qty === 1) {
+			// remove from cart
+			cart.items = (cart.items as CartItem[]).filter(
+				(x) => x.productId !== productId
+			);
+		} else {
+			// decrease quantity
+			(cart.items as CartItem[]).find((x) => x.productId === productId)!.qty =
+				exist.qty - 1;
+		}
+
+		// update cart db
+		await prisma.cart.update({
+			where: {
+				id: cart.id
+			},
+			data: {
+				items: cart.items as Prisma.CartUpdateitemsInput[],
+				...calcPrice(cart.items as CartItem[])
+			}
+		});
+
+		revalidatePath(`/products/${product.slug}`);
+
+		return {
+			success: true,
+			message: `${product.name} was removed from cart`
+		};
+	} catch (error: unknown) {
+		return {
+			success: false,
+			message: formatError(error)
+		};
+	}
+}
