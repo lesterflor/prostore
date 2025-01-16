@@ -1,6 +1,6 @@
 'use server';
 import { convertToPOJO } from '@/lib/utils';
-import { prisma } from '@/db/prisma';
+import prisma from '@/db/prisma';
 import { LATEST_PRODUCTS_LIMIT } from '../constants';
 import { IProduct } from '@/types';
 

@@ -1,6 +1,6 @@
 'use server';
 
-import { prisma } from '@/db/prisma';
+import prisma from '@/db/prisma';
 import { CartItem } from '@/types';
 import { convertToPOJO, formatError, round2 } from '../utils';
 import { cookies } from 'next/headers';
