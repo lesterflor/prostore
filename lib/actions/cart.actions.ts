@@ -6,6 +6,8 @@ import { convertToPOJO, formatError, round2 } from '../utils';
 import { cookies } from 'next/headers';
 import { auth } from '@/auth';
 import { cartItemSchema, insertCartSchema } from '../validators';
+import { revalidatePath } from 'next/cache';
+import { Prisma } from '@prisma/client';
 
 // calculate cart prices
 const calcPrice = (items: CartItem[]) => {
@@ -43,8 +45,6 @@ export async function addItemToCart(data: CartItem) {
 		// parse and validate item
 		const item = cartItemSchema.parse(data);
 
-		console.log('item', item);
-
 		// find product in db
 		const product = await prisma.product.findFirst({
 			where: {
@@ -65,7 +65,62 @@ export async function addItemToCart(data: CartItem) {
 				...calcPrice([item])
 			});
 
-			console.log(newCart);
+			await prisma.cart.create({
+				data: newCart
+			});
+
+			revalidatePath(`/products/${data.slug}`);
+
+			return {
+				success: true,
+				message: `${product.name} added to cart`
+			};
+		} else {
+			// check if item is already in the cart
+			const existItem = (cart.items as CartItem[]).find(
+				(x) => x.productId === item.productId
+			);
+
+			if (existItem) {
+				// check stock
+				if (product.stock < existItem.qty + 1) {
+					throw new Error('Not enough stock');
+				}
+
+				// increase quantity
+				(cart.items as CartItem[]).find(
+					(x) => x.productId === item.productId
+				)!.qty = existItem.qty + 1;
+			} else {
+				// if item does not exist in cart
+				// check stock
+				if (product.stock < 1) {
+					throw new Error('Not enough stock');
+				}
+
+				// add item to the cart.items
+				cart.items.push(item);
+			}
+
+			// save to db
+			await prisma.cart.update({
+				where: {
+					id: cart.id
+				},
+				data: {
+					items: cart.items as Prisma.CartUpdateitemsInput[],
+					...calcPrice(cart.items as CartItem[])
+				}
+			});
+
+			revalidatePath(`/products/${data.slug}`);
+
+			return {
+				success: true,
+				message: `${product.name} ${
+					!!existItem ? 'updated in' : 'added to'
+				} cart`
+			};
 		}
 	} catch (error: unknown) {
 		return {
@@ -73,11 +128,6 @@ export async function addItemToCart(data: CartItem) {
 			message: formatError(error)
 		};
 	}
-
-	return {
-		success: true,
-		message: 'Item added to Cart'
-	};
 }
 
 export async function getMyCart() {
@@ -96,7 +146,7 @@ export async function getMyCart() {
 	const cart = await prisma.cart.findFirst({
 		where: userId
 			? {
-					id: userId
+					userId
 			  }
 			: {
 					sessionCartId
