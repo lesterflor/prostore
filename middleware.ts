@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from './auth';
 
-export default function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
+	// get pathname
+	const { pathname } = request.nextUrl;
+
+	// check if user is not authenticated and accessing protected route
+	const session = await auth();
+	const userId = session?.user?.id;
+
+	if (!userId && protectedPaths.some((p) => p.test(pathname))) {
+		return NextResponse.redirect(new URL('/sign-in', request.url));
+	}
+
 	// clone request headers
 	const newRequestHeaders = new Headers(request.headers);
 
@@ -20,3 +32,13 @@ export default function middleware(request: NextRequest) {
 
 	return response;
 }
+
+const protectedPaths = [
+	/\/shipping-address/,
+	/\/payment-method/,
+	/\/place-order/,
+	/\/profile/,
+	/\/user\/(.*)/,
+	/\/order\/(.*)/,
+	/\/admin/
+];
