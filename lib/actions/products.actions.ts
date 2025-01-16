@@ -17,6 +17,7 @@ export async function getLatestProducts(): Promise<IProduct[]> {
 		return {
 			...item,
 			price: Number(item.price).toFixed(2),
+			rating: Number(item.rating).toFixed(2),
 			createdAt: new Date(item.createdAt.toString())
 		};
 	});
@@ -33,10 +34,13 @@ export async function getProductBySlug(slug: string) {
 	});
 
 	if (product) {
-		Object.assign(product, {
-			price: Number(product?.price).toFixed(2)
-		});
+		const newObj = {
+			...product,
+			price: Number(product?.price).toFixed(2),
+			rating: Number(product?.rating).toFixed(2)
+		};
+		return newObj;
 	}
 
-	return product;
+	return null;
 }
