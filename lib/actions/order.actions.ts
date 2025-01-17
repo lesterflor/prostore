@@ -131,10 +131,17 @@ export async function getOrderByIdAction(orderId: string) {
 		}
 	});
 
+	if (!data) {
+		throw new Error('Order was not found');
+	}
+
 	const cleansed = {
 		...data,
-		totalPrice: Number(data?.totalPrice).toFixed(2),
-		orderItems: data?.orderItems.map((item) => {
+		totalPrice: Number(data.totalPrice).toFixed(2),
+		itemsPrice: Number(data.itemsPrice).toFixed(2),
+		shippingPrice: Number(data.shippingPrice).toFixed(2),
+		taxPrice: Number(data.taxPrice).toFixed(2),
+		orderItems: data.orderItems.map((item) => {
 			return {
 				...item,
 				price: Number(item.price).toFixed(2)
