@@ -1,7 +1,7 @@
 'use server';
 
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
-import { formatError } from '../utils';
+import { convertToPOJO, formatError } from '../utils';
 import { auth } from '@/auth';
 import { getMyCart } from './cart.actions';
 import { getUserById } from './user.actions';
@@ -113,4 +113,34 @@ export async function createOrderAction() {
 			message: formatError(error)
 		};
 	}
+}
+
+export async function getOrderByIdAction(orderId: string) {
+	const data = await prisma.order.findFirst({
+		where: {
+			id: orderId
+		},
+		include: {
+			orderItems: true,
+			user: {
+				select: {
+					name: true,
+					email: true
+				}
+			}
+		}
+	});
+
+	const cleansed = {
+		...data,
+		totalPrice: Number(data?.totalPrice).toFixed(2),
+		orderItems: data?.orderItems.map((item) => {
+			return {
+				...item,
+				price: Number(item.price).toFixed(2)
+			};
+		})
+	};
+
+	return convertToPOJO(cleansed);
 }
