@@ -163,9 +163,7 @@ export async function createPaypalOrderAction(orderId: string) {
 			}
 		});
 
-		if (!order) {
-			throw new Error('Order not found');
-		} else {
+		if (order) {
 			// create paypal order
 			const paypalOrder = await paypal.createOrder(Number(order.totalPrice));
 
@@ -189,6 +187,8 @@ export async function createPaypalOrderAction(orderId: string) {
 				message: 'Order item created successfully',
 				data: paypalOrder.id
 			};
+		} else {
+			throw new Error('Order not found');
 		}
 	} catch (error: unknown) {
 		return {
