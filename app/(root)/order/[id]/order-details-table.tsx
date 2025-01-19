@@ -14,8 +14,26 @@ import { formatCurrency, formatDateTime, formatId } from '@/lib/utils';
 import { Order } from '@/types';
 import Link from 'next/link';
 import Image from 'next/image';
+import {
+	PayPalButtons,
+	PayPalScriptProvider,
+	usePayPalScriptReducer
+} from '@paypal/react-paypal-js';
+import {
+	createPaypalOrderAction,
+	approvePaypalOrderAction
+} from '@/lib/actions/order.actions';
+import { useToast } from '@/hooks/use-toast';
 
-export default function OrderDetailsTable({ order }: { order: Order }) {
+export default function OrderDetailsTable({
+	order,
+	paypalClientId
+}: {
+	order: Order;
+	paypalClientId: string;
+}) {
+	const { toast } = useToast();
+
 	const {
 		shippingAddress,
 		orderItems,
@@ -29,6 +47,42 @@ export default function OrderDetailsTable({ order }: { order: Order }) {
 		paidAt,
 		deliveredAt
 	} = order;
+
+	const PrintLoadingState = () => {
+		const [{ isPending, isRejected }] = usePayPalScriptReducer();
+		let status = '';
+
+		if (isPending) {
+			status = 'Loading';
+		} else if (isRejected) {
+			status = 'Error Loading Paypal';
+		}
+
+		return status;
+	};
+
+	const handleCreatePaypalOrder = async () => {
+		const res = await createPaypalOrderAction(order.id);
+
+		if (!res.success) {
+			toast({
+				variant: 'destructive',
+				description: res.message
+			});
+		}
+
+		return res.data;
+	};
+
+	const handleApprovePaypalOrder = async (data: { orderID: string }) => {
+		const res = await approvePaypalOrderAction(order.id, data);
+
+		toast({
+			variant: !res.success ? 'destructive' : 'default',
+			description: res.message
+		});
+	};
+
 	return (
 		<>
 			<h1 className='py-4 text-2xl'>Order {formatId(order.id)}</h1>
@@ -132,6 +186,21 @@ export default function OrderDetailsTable({ order }: { order: Order }) {
 									{formatCurrency(totalPrice)}
 								</div>
 							</div>
+							{/* Paypal payment */}
+							{!isPaid && paymentMethod === 'PayPal' && (
+								<div>
+									<PayPalScriptProvider
+										options={{
+											clientId: paypalClientId
+										}}>
+										<PrintLoadingState />
+										<PayPalButtons
+											createOrder={handleCreatePaypalOrder}
+											onApprove={handleApprovePaypalOrder}
+										/>
+									</PayPalScriptProvider>
+								</div>
+							)}
 						</CardContent>
 					</Card>
 				</div>
