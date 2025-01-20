@@ -45,7 +45,7 @@ export default function Pagination({
 				size='lg'
 				variant='outline'
 				className='w-28'
-				disabled={Number(page) > 1}
+				disabled={Number(page) >= totalPages}
 				onClick={() => handleClick('next')}>
 				Next
 			</Button>

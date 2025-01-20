@@ -29,7 +29,7 @@ export default async function OrderPage(props: {
 	return (
 		<div className='space-y-2'>
 			<h2 className='h2-bold'>Orders</h2>
-			<div className='overflow-x-uto'>
+			<div className='overflow-x-auto'>
 				<Table>
 					<TableHeader>
 						<TableRow>
