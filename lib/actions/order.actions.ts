@@ -10,6 +10,7 @@ import { insertOrderSchema } from '../validators';
 import { CartItem, PaymentResult } from '@/types';
 import { paypal } from '../paypal';
 import { revalidatePath } from 'next/cache';
+import { PAGE_SIZE } from '../constants';
 
 export async function createOrderAction() {
 	try {
@@ -324,5 +325,52 @@ async function updateOrderToPaid({
 
 	if (!updatedOrder) {
 		throw new Error('Order transaction failed');
+	}
+}
+
+// get orders
+export async function getMyOrdersAction({
+	limit = PAGE_SIZE,
+	page
+}: {
+	limit?: number;
+	page: number;
+}) {
+	const session = await auth();
+	if (!session) {
+		throw new Error('User is not authorized');
+	}
+
+	try {
+		const data = await prisma.order.findMany({
+			where: {
+				userId: session?.user?.id
+			},
+			orderBy: {
+				createdAt: 'desc'
+			},
+			take: limit,
+			skip: (page - 1) * limit
+		});
+
+		const dataCount = await prisma.order.count({
+			where: {
+				userId: session?.user?.id
+			}
+		});
+
+		if (!data) {
+			throw new Error('User orders not found');
+		}
+
+		return {
+			data,
+			totalPages: Math.ceil(dataCount / limit)
+		};
+	} catch (error: unknown) {
+		return {
+			success: false,
+			message: formatError(error)
+		};
 	}
 }
