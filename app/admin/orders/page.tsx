@@ -1,4 +1,4 @@
-import { getAllOrders } from '@/lib/actions/order.actions';
+import { deleteOrder, getAllOrders } from '@/lib/actions/order.actions';
 import { auth } from '@/auth';
 import { Metadata } from 'next';
 import {
@@ -13,6 +13,7 @@ import { formatCurrency, formatDateTime, formatId } from '@/lib/utils';
 import Link from 'next/link';
 import Pagination from '@/components/shared/pagination';
 import { Button } from '@/components/ui/button';
+import DeleteDialog from '@/components/shared/delete-dialogue';
 
 export const metadata: Metadata = {
 	title: 'Orders Overview'
@@ -76,6 +77,10 @@ export default async function OrdersPage(props: {
 										<Link href={`/order/${order.id}`}>Details</Link>
 									</Button>
 									{/* delete button */}
+									<DeleteDialog
+										id={order.id}
+										action={deleteOrder}
+									/>
 								</TableCell>
 							</TableRow>
 						))}

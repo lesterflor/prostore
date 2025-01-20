@@ -458,3 +458,26 @@ export async function getAllOrders({
 		totalPages: Math.ceil(dataCount / limit)
 	};
 }
+
+// delete order fro admin page
+export async function deleteOrder(id: string) {
+	try {
+		await prisma.order.delete({
+			where: {
+				id
+			}
+		});
+
+		revalidatePath('/admin/orders');
+
+		return {
+			success: true,
+			message: 'Order deleted successfully'
+		};
+	} catch (error: unknown) {
+		return {
+			success: false,
+			message: formatError(error)
+		};
+	}
+}
