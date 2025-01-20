@@ -73,7 +73,7 @@ export default async function OrderPage(props: {
 					</TableBody>
 				</Table>
 
-				{orders.totalPages! >= 1 && (
+				{orders.totalPages! > 1 && (
 					<Pagination
 						page={Number(page) || 1}
 						totalPages={orders?.totalPages || 1}

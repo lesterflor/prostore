@@ -49,6 +49,9 @@ export default function Pagination({
 				onClick={() => handleClick('next')}>
 				Next
 			</Button>
+			<span className='flex items-center px-2 text-xs '>
+				Page {page} of {totalPages}
+			</span>
 		</div>
 	);
 }
