@@ -481,3 +481,61 @@ export async function deleteOrder(id: string) {
 		};
 	}
 }
+
+// update order to paid (for cases like C.O.D.)
+export async function updateOrderToPaidCOD(orderId: string) {
+	try {
+		await updateOrderToPaid({ orderId });
+
+		revalidatePath(`/order/${orderId}`);
+
+		return {
+			success: true,
+			message: 'COD order marked as paid'
+		};
+	} catch (error: unknown) {
+		return {
+			success: false,
+			message: formatError(error)
+		};
+	}
+}
+
+// update COD order to delivered
+export async function deliverOrderAction(orderId: string) {
+	try {
+		const order = await prisma.order.findFirst({
+			where: { id: orderId }
+		});
+
+		if (!order) {
+			throw new Error('Order not found');
+		}
+
+		if (!order.isPaid) {
+			throw new Error('Order was not paid');
+		}
+
+		await prisma.order.update({
+			where: {
+				id: orderId
+			},
+			data: {
+				isDelivered: true,
+				deliveredAt: new Date()
+			}
+		});
+
+		revalidatePath(`/order/${orderId}`);
+
+		return {
+			success: true,
+			message: 'Order has been marked delivered'
+		};
+	} catch (error: unknown) {
+		return {
+			success: false,
+			message: formatError(error)
+		};
+	}
+}

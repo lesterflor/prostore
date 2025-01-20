@@ -21,18 +21,26 @@ import {
 } from '@paypal/react-paypal-js';
 import {
 	createPaypalOrderAction,
-	approvePaypalOrderAction
+	approvePaypalOrderAction,
+	updateOrderToPaidCOD,
+	deliverOrderAction
 } from '@/lib/actions/order.actions';
 import { useToast } from '@/hooks/use-toast';
+import { useTransition } from 'react';
+import { Button } from '@/components/ui/button';
 
 export default function OrderDetailsTable({
 	order,
-	paypalClientId
+	paypalClientId,
+	isAdmin = false
 }: {
 	order: Order;
 	paypalClientId: string;
+	isAdmin?: boolean;
 }) {
 	const { toast } = useToast();
+
+	const [isPending, startTransition] = useTransition();
 
 	const {
 		shippingAddress,
@@ -81,6 +89,48 @@ export default function OrderDetailsTable({
 			variant: !res.success ? 'destructive' : 'default',
 			description: res.message
 		});
+	};
+
+	// button to mark order as paid
+	const MarkAsPaidButton = () => {
+		return (
+			<Button
+				type='button'
+				disabled={isPending}
+				onClick={() =>
+					startTransition(async () => {
+						const res = await updateOrderToPaidCOD(order.id);
+
+						toast({
+							variant: res.success ? 'default' : 'destructive',
+							description: res.message
+						});
+					})
+				}>
+				{isPending ? 'Processing...' : 'Mark as Paid'}
+			</Button>
+		);
+	};
+
+	// button to mark order as delievered
+	const MarkAsDeliveredButton = () => {
+		return (
+			<Button
+				type='button'
+				disabled={isPending}
+				onClick={() =>
+					startTransition(async () => {
+						const res = await deliverOrderAction(order.id);
+
+						toast({
+							variant: res.success ? 'default' : 'destructive',
+							description: res.message
+						});
+					})
+				}>
+				{isPending ? 'Processing...' : 'Mark as Delivered'}
+			</Button>
+		);
 	};
 
 	return (
@@ -201,6 +251,13 @@ export default function OrderDetailsTable({
 									</PayPalScriptProvider>
 								</div>
 							)}
+
+							{/* Cash on Delivery */}
+							{isAdmin && !isPaid && paymentMethod === 'CashOnDelivery' && (
+								<MarkAsPaidButton />
+							)}
+
+							{isAdmin && isPaid && !isDelivered && <MarkAsDeliveredButton />}
 						</CardContent>
 					</Card>
 				</div>
