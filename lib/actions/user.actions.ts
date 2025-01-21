@@ -3,7 +3,8 @@ import {
 	shippingAddressSchema,
 	signInFormSchema,
 	signUpFormSchema,
-	paymentMethodSchema
+	paymentMethodSchema,
+	updateUserSchema
 } from './../validators';
 import { auth, signIn, signOut } from '@/auth';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
@@ -266,6 +267,42 @@ export async function deleteUserById(id: string) {
 		return {
 			success: true,
 			message: 'User deleted successfully'
+		};
+	} catch (error: unknown) {
+		return {
+			success: false,
+			message: formatError(error)
+		};
+	}
+}
+
+export async function updateUserAction(user: z.infer<typeof updateUserSchema>) {
+	try {
+		const existingUser = await prisma.user.findFirst({
+			where: {
+				id: user.id
+			}
+		});
+
+		if (!existingUser) {
+			throw new Error('User was not found');
+		}
+
+		await prisma.user.update({
+			where: {
+				id: existingUser.id
+			},
+			data: {
+				name: user.name,
+				role: user.role
+			}
+		});
+
+		revalidatePath('/admin/users');
+
+		return {
+			success: true,
+			message: 'User updated successfully'
 		};
 	} catch (error: unknown) {
 		return {
