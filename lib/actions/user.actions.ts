@@ -12,6 +12,8 @@ import prisma from '@/db/prisma';
 import { formatError } from '../utils';
 import { ShippingAddress } from '@/types';
 import { z } from 'zod';
+import { PAGE_SIZE } from '../constants';
+import { revalidatePath } from 'next/cache';
 
 // sign in the user with credentials
 export async function signInWithCredentials(
@@ -213,6 +215,57 @@ export async function updateProfileAction(user: {
 		return {
 			success: true,
 			message: 'User updated successfully'
+		};
+	} catch (error: unknown) {
+		return {
+			success: false,
+			message: formatError(error)
+		};
+	}
+}
+
+export async function getAllUsers({
+	limit = PAGE_SIZE,
+	page
+}: {
+	limit?: number;
+	page: number;
+}) {
+	const data = await prisma.user.findMany({
+		take: limit,
+		orderBy: {
+			createdAt: 'desc'
+		}
+		//skip: (page - 1) * limit
+	});
+
+	const userCount = await prisma.user.count();
+
+	return {
+		data,
+		totalPages: Math.ceil(userCount / limit)
+	};
+}
+
+export async function deleteUserById(id: string) {
+	try {
+		const session = await auth();
+
+		if (!session?.user) {
+			throw new Error('User was not found');
+		}
+
+		await prisma.user.delete({
+			where: {
+				id
+			}
+		});
+
+		revalidatePath('/admin/users');
+
+		return {
+			success: true,
+			message: 'User deleted successfully'
 		};
 	} catch (error: unknown) {
 		return {
