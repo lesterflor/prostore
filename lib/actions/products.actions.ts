@@ -47,6 +47,25 @@ export async function getProductBySlug(slug: string) {
 
 	return null;
 }
+// get single product by id
+export async function getProductById(id: string) {
+	const product = await prisma.product.findFirst({
+		where: {
+			id
+		}
+	});
+
+	if (product) {
+		const newObj = {
+			...product,
+			price: Number(product?.price).toFixed(2),
+			rating: Number(product?.rating).toFixed(2)
+		};
+		return newObj;
+	}
+
+	return null;
+}
 
 export async function getAllProducts({
 	query,

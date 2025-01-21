@@ -95,7 +95,7 @@ export default async function AdminProductsPage(props: {
 					))}
 				</TableBody>
 			</Table>
-			{!!products?.totalPages && products.totalPages > 1 && (
+			{products.totalPages > 1 && (
 				<Pagination
 					page={page}
 					totalPages={products.totalPages}
