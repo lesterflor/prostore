@@ -6,6 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import ProductImages from '@/components/shared/product/product-images';
 import AddToCart from '@/components/shared/product/add-to-cart';
 import { getMyCart } from '@/lib/actions/cart.actions';
+import { auth } from '@/auth';
+import ReviewList from './review-list';
 
 export default async function ProductDetailsPage(props: {
 	params: Promise<{ slug: string }>;
@@ -19,6 +21,9 @@ export default async function ProductDetailsPage(props: {
 	}
 
 	const cart = await getMyCart();
+
+	const session = await auth();
+	const userId = session?.user?.id;
 
 	return (
 		<>
@@ -92,6 +97,15 @@ export default async function ProductDetailsPage(props: {
 						</Card>
 					</div>
 				</div>
+			</section>
+
+			<section className='mt-10'>
+				<h2 className='h2-bold'>Customer Reviews</h2>
+				<ReviewList
+					userId={userId || ''}
+					productId={product.id}
+					productSlug={product.slug}
+				/>
 			</section>
 		</>
 	);
