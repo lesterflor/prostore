@@ -203,3 +203,37 @@ export async function updateProductAction(
 		};
 	}
 }
+
+// get all categories
+export async function getAllCategories() {
+	const data = await prisma.product.groupBy({
+		by: ['category'],
+		_count: true
+	});
+
+	return data;
+}
+
+// get featured products
+export async function getFeaturedProducts() {
+	const data = await prisma.product.findMany({
+		where: {
+			isFeatured: true
+		},
+		orderBy: {
+			createdAt: 'desc'
+		},
+		take: 4
+	});
+
+	const noDecimal = data.map((item) => {
+		return {
+			...item,
+			price: Number(item.price).toFixed(2),
+			rating: Number(item.rating).toFixed(2),
+			createdAt: new Date(item.createdAt.toString())
+		};
+	});
+
+	return convertToPOJO(noDecimal);
+}
