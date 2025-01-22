@@ -72,12 +72,18 @@ export async function getAllProducts({
 	query,
 	limit = PAGE_SIZE,
 	page,
-	category
+	price,
+	category,
+	rating,
+	sort
 }: {
 	query: string;
 	limit?: number;
 	page: number;
 	category?: string;
+	price?: string;
+	rating?: string;
+	sort?: string;
 }) {
 	// query filter
 	const queryFilter: Prisma.ProductWhereInput =
@@ -101,10 +107,18 @@ export async function getAllProducts({
 		}
 	});
 
+	const cleanData = data.map((item) => {
+		return {
+			...item,
+			price: Number(item.price).toFixed(2),
+			rating: item.rating.toString()
+		};
+	});
+
 	const dataCount = await prisma.product.count();
 
 	return {
-		data,
+		data: cleanData,
 		totalPages: Math.ceil(dataCount / limit)
 	};
 }
