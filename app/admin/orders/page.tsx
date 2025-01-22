@@ -22,9 +22,10 @@ export const metadata: Metadata = {
 export default async function OrdersPage(props: {
 	searchParams: Promise<{
 		page: string;
+		query: string;
 	}>;
 }) {
-	const { page = '1' } = await props.searchParams;
+	const { page = '1', query = '' } = await props.searchParams;
 
 	const session = await auth();
 
@@ -32,17 +33,32 @@ export default async function OrdersPage(props: {
 		throw new Error('User is not authorized');
 	}
 
-	const orders = await getAllOrders({ page: Number(page) });
+	const orders = await getAllOrders({ page: Number(page), query });
 
 	return (
 		<div className='space-y-2'>
-			<h2 className='h2-bold'>Orders</h2>
+			<div className='items-center gap-3'>
+				<h2 className='h2-bold'>Orders</h2>
+				{query && (
+					<div>
+						Filtered by <i>&quot;{query}&quot;</i>{' '}
+						<Link href='/admin/orders'>
+							<Button
+								variant='outline'
+								size='sm'>
+								Remove Filter
+							</Button>
+						</Link>
+					</div>
+				)}
+			</div>
 			<div className='overflow-x-auto'>
 				<Table>
 					<TableHeader>
 						<TableRow>
 							<TableHead>ID</TableHead>
 							<TableHead>DATE</TableHead>
+							<TableHead>BUYER</TableHead>
 							<TableHead>TOTAL</TableHead>
 							<TableHead>PAID</TableHead>
 							<TableHead>DELIVERED</TableHead>
@@ -56,6 +72,7 @@ export default async function OrdersPage(props: {
 								<TableCell>
 									{formatDateTime(order.createdAt).dateTime}
 								</TableCell>
+								<TableCell>{order.user.name}</TableCell>
 								<TableCell>
 									{formatCurrency(Number(order.totalPrice).toFixed(2))}
 								</TableCell>
@@ -69,7 +86,7 @@ export default async function OrdersPage(props: {
 										? formatDateTime(order.deliveredAt).dateTime
 										: 'Not Delivered'}
 								</TableCell>
-								<TableCell>
+								<TableCell className='flex items-center gap-0'>
 									<Button
 										asChild
 										variant='outline'

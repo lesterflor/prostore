@@ -2,18 +2,8 @@ import Menu from '@/components/shared/header/menu';
 import { APP_NAME } from '@/lib/constants';
 import Image from 'next/image';
 import Link from 'next/link';
-import MainNav from './main-nav';
 import AdminMainNav from './main-nav';
-import { Input } from '@/components/ui/input';
-
-// export const metadata: Metadata = {
-// 	title: {
-// 		template: `%s | Prostore`,
-// 		default: APP_NAME
-// 	},
-// 	description: APP_DESCRIPTION,
-// 	metadataBase: new URL(SERVER_URL)
-// };
+import AdminSearch from '@/components/admin/admin-search';
 
 export default function AdminLayout({
 	children
@@ -37,13 +27,7 @@ export default function AdminLayout({
 					{/* Main nav */}
 					<AdminMainNav className='mx-6' />
 					<div className='ml-auto items-center flex space-x-4'>
-						<div>
-							<Input
-								type='search'
-								placeholder='search...'
-								className='md:w-[100px] lg:w-[300px]'
-							/>
-						</div>
+						<AdminSearch />
 						<Menu />
 					</div>
 				</div>

@@ -431,12 +431,29 @@ export async function getOrderSummarayAction() {
 // get all orders
 export async function getAllOrders({
 	limit = PAGE_SIZE,
-	page
+	page,
+	query
 }: {
 	limit?: number;
 	page: number;
+	query: string;
 }) {
+	const queryFilter: Prisma.OrderWhereInput =
+		query && query !== 'all'
+			? {
+					user: {
+						name: {
+							contains: query,
+							mode: 'insensitive'
+						} as Prisma.StringFilter
+					}
+			  }
+			: {};
+
 	const data = await prisma.order.findMany({
+		where: {
+			...queryFilter
+		},
 		orderBy: {
 			createdAt: 'desc'
 		},
