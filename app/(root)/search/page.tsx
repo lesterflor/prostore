@@ -20,9 +20,9 @@ export async function generateMetadata(props: {
 		category = 'all',
 		q = 'all',
 		price = 'all',
-		rating = 'all',
-		sort = 'newest',
-		page = '1'
+		rating = 'all'
+		//sort = 'newest',
+		//page = '1'
 	} = await props.searchParams;
 
 	const isQuerySet = q && q !== 'all' && q.trim() !== '';
