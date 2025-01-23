@@ -28,15 +28,18 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useTransition } from 'react';
 import { Button } from '@/components/ui/button';
+import StripePayment from './stripe-payment';
 
 export default function OrderDetailsTable({
 	order,
 	paypalClientId,
+	stripeClientSecret,
 	isAdmin = false
 }: {
 	order: Order;
 	paypalClientId: string;
 	isAdmin?: boolean;
+	stripeClientSecret?: string | null;
 }) {
 	const { toast } = useToast();
 
@@ -250,6 +253,15 @@ export default function OrderDetailsTable({
 										/>
 									</PayPalScriptProvider>
 								</div>
+							)}
+
+							{/* Stripe payment */}
+							{!isPaid && paymentMethod === 'Stripe' && stripeClientSecret && (
+								<StripePayment
+									priceInCents={Number(totalPrice) * 100}
+									clientSecret={stripeClientSecret}
+									orderId={order.id}
+								/>
 							)}
 
 							{/* Cash on Delivery */}
