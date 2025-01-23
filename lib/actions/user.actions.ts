@@ -232,13 +232,12 @@ export async function getAllUsers({
 	limit?: number;
 	page: number;
 }) {
-	console.log(page);
 	const data = await prisma.user.findMany({
 		take: limit,
 		orderBy: {
 			createdAt: 'desc'
-		}
-		//skip: (page - 1) * limit
+		},
+		skip: (page - 1) * limit
 	});
 
 	const userCount = await prisma.user.count();

@@ -85,8 +85,6 @@ export async function getAllProducts({
 	rating?: string;
 	sort?: string;
 }) {
-	console.log(page);
-
 	// query filter
 	const queryFilter: Prisma.ProductWhereInput =
 		query && query !== 'all'
@@ -131,9 +129,6 @@ export async function getAllProducts({
 			...priceFilter,
 			...ratingFilter
 		},
-		take: limit,
-		// skip: (page - 1) * limit,
-
 		orderBy:
 			sort === 'lowest'
 				? { price: 'asc' }
@@ -141,7 +136,10 @@ export async function getAllProducts({
 				? { price: 'desc' }
 				: sort === 'rating'
 				? { rating: 'desc' }
-				: { createdAt: 'desc' }
+				: { createdAt: 'desc' },
+
+		take: limit,
+		skip: (page - 1) * limit
 	});
 
 	const cleanData = data.map((item) => {

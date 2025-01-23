@@ -41,7 +41,7 @@ export async function createOrderAction() {
 			return {
 				success: false,
 				message: 'No shipping address',
-				redirectTo: '/shippin-address'
+				redirectTo: '/shipping-address'
 			};
 		}
 		if (!user.paymentMethod) {
@@ -476,7 +476,7 @@ export async function getAllOrders({
 	};
 }
 
-// delete order fro admin page
+// delete order from admin page
 export async function deleteOrder(id: string) {
 	try {
 		await prisma.order.delete({
