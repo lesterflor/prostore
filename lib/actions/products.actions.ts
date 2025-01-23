@@ -85,6 +85,8 @@ export async function getAllProducts({
 	rating?: string;
 	sort?: string;
 }) {
+	console.log(page);
+
 	// query filter
 	const queryFilter: Prisma.ProductWhereInput =
 		query && query !== 'all'

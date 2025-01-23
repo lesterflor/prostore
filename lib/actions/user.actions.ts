@@ -232,6 +232,7 @@ export async function getAllUsers({
 	limit?: number;
 	page: number;
 }) {
+	console.log(page);
 	const data = await prisma.user.findMany({
 		take: limit,
 		orderBy: {
