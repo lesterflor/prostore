@@ -26,7 +26,10 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { createUpdateReviewAction } from '@/lib/actions/review.actions';
+import {
+	createUpdateReviewAction,
+	getProductReviewByUser
+} from '@/lib/actions/review.actions';
 import { REVIEW_FORM_DEFAULT_VALUES } from '@/lib/constants';
 import { insertReviewSchema } from '@/lib/validators';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -66,9 +69,17 @@ export default function ReviewForm({
 		});
 	};
 
-	const handleOpenForm = () => {
+	const handleOpenForm = async () => {
 		form.setValue('productId', productId);
 		form.setValue('userId', userId);
+
+		const review = await getProductReviewByUser({ productId });
+
+		if (review) {
+			form.setValue('title', review.data!.title);
+			form.setValue('description', review.data!.description);
+			form.setValue('rating', review.data!.rating);
+		}
 
 		setFormOpen(true);
 	};

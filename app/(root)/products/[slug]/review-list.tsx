@@ -27,7 +27,14 @@ export default function ReviewList({
 }) {
 	const [reviews, setReviews] = useState<Review[]>([]);
 
-	const reload = async () => {};
+	// reload reviews after create or update
+	const reload = async () => {
+		const res = await getReviewsByProductAction({ productId });
+
+		if (res.success) {
+			setReviews(res.data);
+		}
+	};
 
 	useEffect(() => {
 		const loadReviews = async () => {

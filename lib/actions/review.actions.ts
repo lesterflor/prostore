@@ -47,9 +47,9 @@ export async function createUpdateReviewAction(
 				await tx.review.update({
 					where: { id: reviewExists.id },
 					data: {
-						title: reviewExists.title,
-						description: reviewExists.description,
-						rating: reviewExists.rating
+						title: review.title,
+						description: review.description,
+						rating: review.rating
 					}
 				});
 			} else {
@@ -169,7 +169,8 @@ export async function getProductReviewByUser({
 	} catch (error: unknown) {
 		return {
 			success: false,
-			message: formatError(error)
+			message: formatError(error),
+			data: null
 		};
 	}
 }
