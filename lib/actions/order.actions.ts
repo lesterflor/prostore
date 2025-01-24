@@ -7,11 +7,12 @@ import { getMyCart } from './cart.actions';
 import { getUserById } from './user.actions';
 import prisma from '@/db/prisma';
 import { insertOrderSchema } from '../validators';
-import { CartItem, PaymentResult } from '@/types';
+import { CartItem, PaymentResult, ShippingAddress } from '@/types';
 import { paypal } from '../paypal';
 import { revalidatePath } from 'next/cache';
 import { PAGE_SIZE } from '../constants';
 import { Prisma } from '@prisma/client';
+import { sendPurchaseReceipt } from '@/app/(root)/email';
 
 export async function createOrderAction() {
 	try {
@@ -325,8 +326,27 @@ export async function updateOrderToPaid({
 	});
 
 	if (!updatedOrder) {
-		throw new Error('Order transaction failed');
+		throw new Error('Order not found');
 	}
+
+	// send the purchase receipt to client
+	sendPurchaseReceipt({
+		order: {
+			...updatedOrder,
+			itemsPrice: updatedOrder.itemsPrice.toString(),
+			shippingPrice: updatedOrder.shippingPrice.toString(),
+			taxPrice: updatedOrder.taxPrice.toString(),
+			totalPrice: updatedOrder.totalPrice.toString(),
+			orderItems: updatedOrder.orderItems.map((item) => {
+				return {
+					...item,
+					price: item.price.toString()
+				};
+			}),
+			shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
+			paymentResult: updatedOrder.paymentResult as PaymentResult
+		}
+	});
 }
 
 // get orders
@@ -447,7 +467,7 @@ export async function getAllOrders({
 							mode: 'insensitive'
 						} as Prisma.StringFilter
 					}
-			  }
+				}
 			: {};
 
 	const data = await prisma.order.findMany({
