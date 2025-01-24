@@ -36,7 +36,7 @@ export default function OrderDetailsTable({
 	stripeClientSecret,
 	isAdmin = false
 }: {
-	order: Order;
+	order: Omit<Order, 'paymentResult'>;
 	paypalClientId: string;
 	isAdmin?: boolean;
 	stripeClientSecret?: string | null;
